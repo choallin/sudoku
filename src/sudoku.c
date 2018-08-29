@@ -1,6 +1,6 @@
-#include <stdlib.h>  /* Standard stdlib (system) functions */
-#include <stdio.h>   /* Standard IO functions */
+#include <stdlib.h>  /* Standard stdlib functions */
 
+// include all internal dependencies
 #include "../lib/sudoku.h"
 
 Sudoku *newSudoku() {
@@ -9,7 +9,6 @@ Sudoku *newSudoku() {
   // IMPORTANT: The user of this "object" has to
   // make sure to free the memory when it is not needed
   // anymore
-  printf("allocate memory: %ld \n", sizeof(Sudoku));
   Sudoku *self = (Sudoku *)malloc(sizeof(Sudoku));
 
   // If we fail to allocate memory propage failure with
@@ -17,7 +16,6 @@ Sudoku *newSudoku() {
   if (self == NULL) {
     return NULL;
   }
-
 
   // Set the function pointers to the right function
   // so that we have oo like behavior (& is not needed

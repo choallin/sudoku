@@ -4,7 +4,7 @@
 #include <stdint.h> /* int size definition */
 #include <stdlib.h>  /* Standard stdlib (system) functions */
 
-#include "lib/simple_terminal_drawer.h"
+#include "lib/terminal_view.h"
 #include "lib/sudoku.h"
 #include "lib/helpers.h"
 
@@ -35,8 +35,12 @@ int main(int argc, char const *argv[])
   char menu_selection[MENU_SIZE];
   Sudoku *current_sudoku;
   current_sudoku = newSudoku();
+  // Create the view manager
+  struct TerminalView *view = newTerminalView();
+  // The view manager is also able to create an
+  // empty Sudoku, so here we initialize it
+  view->update_view(view, current_sudoku, EDIT_MODE);
 
-  initial_terminal_setup();
   int input_switch;
   do
   {
@@ -47,10 +51,12 @@ int main(int argc, char const *argv[])
     switch (input_switch)
     {
       case NEW_SUDOKU:
+        // Since the new and edit action draws
+        // exactly the same thing we don't need
+        // a break in this case statement
         initialize_new_sudoku(current_sudoku);
-        break;
       case EDIT_SUDOKU:
-        puts("Not implemented yet");
+        view->update_view(view, current_sudoku, EDIT_MODE);
         break;
       case SOLVE_SUDOKU:
         puts("Not implemented yet");
