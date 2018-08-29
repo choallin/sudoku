@@ -3,10 +3,10 @@
 #include <string.h>  /* String library, might be useful */
 
 #include "../lib/simple_terminal_drawer.h"
-#include "../lib/sudoku.h"
 
 void initial_terminal_setup() {
   system("clear");
+  create_main_menu();
 }
 
 void create_main_menu() {

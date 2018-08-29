@@ -6,7 +6,6 @@
 
 #include "lib/simple_terminal_drawer.h"
 #include "lib/sudoku.h"
-
 #include "lib/helpers.h"
 
 #define MENU_SIZE 10
@@ -21,28 +20,41 @@ int convert_to_menu_enum(char *menu_selection) {
   return (int)menu_selection[0];
 }
 
+void initialize_new_sudoku(Sudoku *sudoku) {
+  // We free the memory of the old Sudoku
+  free(sudoku);
+  // And create a new one.
+  // Performance can be improved since we allocate
+  // memory again but for this small programm it will
+  // work
+  sudoku = newSudoku();
+}
+
 int main(int argc, char const *argv[])
 {
   char menu_selection[MENU_SIZE];
-  initial_terminal_setup();
-  create_main_menu();
+  Sudoku *current_sudoku;
+  current_sudoku = newSudoku();
 
+  initial_terminal_setup();
   int input_switch;
   do
   {
     // Waiting for input to see what we should do next
-    printf("Please choose... ");
+    puts("Please choose... ");
     await_input(menu_selection, MENU_SIZE, "%s");
     input_switch = convert_to_menu_enum(menu_selection);
     switch (input_switch)
     {
       case NEW_SUDOKU:
-        puts("Not implemented yet");
+        initialize_new_sudoku(current_sudoku);
         break;
       case EDIT_SUDOKU:
         puts("Not implemented yet");
+        break;
       case SOLVE_SUDOKU:
         puts("Not implemented yet");
+        break;
       default:
         break;
     }
