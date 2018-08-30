@@ -6,13 +6,12 @@
 
 #include "../lib/input_manager.h"
 
-
-
 int process_input(void *self, Sudoku *model);
 int convert_to_menu_enum(char *menu_selection);
 int convert_to_consts(char *input);
 char *process_raw_input();
 int current_column(Sudoku *model);
+void move_on_model(struct InputManager *self, Sudoku *model, int current_col, int distance, char value);
 
 struct InputManager *newInputManager() {
   // Again we are using static because this is a "Singleton"
@@ -39,20 +38,22 @@ int process_input(void *self, Sudoku *model) {
   switch (convert_to_consts(input))
   {
     case NEXT_COLUMN:
-      // If we move over a column we need to cache the old
-      // value of it so we can put it in again
-      model->_values[current_col] = converted_self->_old_value_of_column;
-      converted_self->_old_value_of_column = model->_values[current_col + 1];
-      model->_values[current_col + 1] = 'X';
-      // With the state EDIT_SUDOKU we can redraw the output
+      move_on_model(converted_self, model, current_col, 1, 'X');
       menu_state = EDIT_SUDOKU;
       break;
     case PREVIOUS_COLUMN:
+      move_on_model(converted_self, model, current_col, -1, 'X');
+      menu_state = EDIT_SUDOKU;
+      break;
+    case NEXT_ROW:
+      move_on_model(converted_self, model, current_col, 9, 'X');
+      // With the state EDIT_SUDOKU we can redraw the output
+      menu_state = EDIT_SUDOKU;
+      break;
+    case PREVIOUS_ROW:
       // If we move over a column we need to cache the old
       // value of it so we can put it in again
-      model->_values[current_col] = converted_self->_old_value_of_column;
-      converted_self->_old_value_of_column = model->_values[current_col - 1];
-      model->_values[current_col - 1] = 'X';
+      move_on_model(converted_self, model, current_col, -9, 'X');
       menu_state = EDIT_SUDOKU;
       break;
     case 1:
@@ -64,16 +65,18 @@ int process_input(void *self, Sudoku *model) {
     case 7:
     case 8:
     case 9:
-      model->_values[current_col] = input[0];
-      model->_values[current_col + 1] = 'X';
+      // Erase cache
+      converted_self->_old_value_of_column = '-';
+      model->set_column(model, current_col, input[0]);
+      model->set_column(model, current_col + 1, 'X');
       menu_state = EDIT_SUDOKU;
       break;
     case REMOVE_DIGIT:
+      // Erase cache
       converted_self->_old_value_of_column = '-';
-      model->_values[current_col] = '-';
-      model->_values[current_col + 1] = 'X';
+      model->set_column(model, current_col, '-');
+      model->set_column(model, current_col + 1, 'X');
       menu_state = EDIT_SUDOKU;
-      break;
       break;
     case NEW_SUDOKU:
       menu_state = EDIT_SUDOKU;
@@ -126,6 +129,12 @@ int convert_to_consts(char *input) {
   if (strcmp(input, "0") == 0) {
     return REMOVE_DIGIT;
   }
+  if (strcmp(input, "nr") == 0) {
+    return NEXT_ROW;
+  }
+  if (strcmp(input, "pr") == 0) {
+    return PREVIOUS_ROW;
+  }
   return atoi(input);
 }
 
@@ -144,4 +153,13 @@ int current_column(Sudoku *model) {
   }
   // Default is the first column
   return 0;
+}
+
+void move_on_model(struct InputManager *self, Sudoku *model, int current_col, int distance, char value) {
+  // If we move over a column we need to cache the old
+  // value of it so we can put it in again
+  model->set_column(model, current_col, self->_old_value_of_column);
+  self->_old_value_of_column = model->get_column(model, current_col + distance);
+  model->set_column(model, current_col + distance, value);
+  // With the state EDIT_SUDOKU we can redraw the output
 }

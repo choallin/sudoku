@@ -17,6 +17,7 @@ void initialize_new_sudoku(Sudoku *sudoku) {
   // memory again but for this small programm it will
   // work
   sudoku = newSudoku();
+  sudoku->set_column(sudoku, 0, 'X');
 }
 
 int main(int argc, char const *argv[])
@@ -24,6 +25,7 @@ int main(int argc, char const *argv[])
   char *menu_selection;
   Sudoku *current_sudoku;
   current_sudoku = newSudoku();
+  initialize_new_sudoku(current_sudoku);
 
   // Create the view manager
   struct TerminalView *view = newTerminalView();

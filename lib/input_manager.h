@@ -9,7 +9,9 @@
 #define DO_NOTHING 100
 #define NEXT_COLUMN 200
 #define PREVIOUS_COLUMN 300
-#define REMOVE_DIGIT 400
+#define NEXT_ROW 400
+#define PREVIOUS_ROW 500
+#define REMOVE_DIGIT 600
 
 // Menu states
 #define NEW_SUDOKU 110

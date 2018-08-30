@@ -5,6 +5,13 @@
 // include all internal dependencies
 #include "../lib/sudoku.h"
 
+#define ALLOWED_CHARS "123456789X-"
+
+void set_column(void *self, int column, char value);
+char *get_row(const void *self,int row_number);
+char get_column(const void *self,int column_number);
+void set_value(void *self, int row, int column, char value);
+
 Sudoku *newSudoku() {
   // Allocate memory from heap so we can return a
   // pointer to the struct
@@ -25,6 +32,7 @@ Sudoku *newSudoku() {
   self->get_row = &get_row;
   self->get_column = &get_column;
   self->set_value = &set_value;
+  self->set_column = &set_column;
 
   // The values are initialized with 0 as default
 
@@ -62,10 +70,25 @@ char *get_row(const void *self,int row_number) {
   return row_digits;
 }
 
-char *get_column(const void *self,int column_number) {
-
+char get_column(const void *self,int column) {
+  if (column < 0 || column > 81) {
+    return '-';
+  }
+  Sudoku *converted_self = (Sudoku *)self;
+  return converted_self->_values[column];
 }
 
 void set_value(void *self, int row, int column, char value) {
 
+}
+
+void set_column(void *self, int column, char value) {
+  Sudoku *converted_self = (Sudoku *)self;
+  if (strchr(ALLOWED_CHARS, value) == NULL) {
+    return;
+  }
+  if (column < 0 || column > 81) {
+    column = 0;
+  }
+  converted_self->_values[column] = value;
 }

@@ -44,6 +44,8 @@ void draw_edit_menu() {
   puts("====================================");
   puts("\t1. Next Column (nc)");
   puts("\t2. Previous Column (pc)");
+  puts("\t2. Next Row (nr)");
+  puts("\t2. Previous Row (pr)");
   puts("\t3. Put Digit (1-9)");
   puts("\t4. Remove Digit (0)");
   puts("");
