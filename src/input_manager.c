@@ -8,7 +8,7 @@
 
 
 
-int process_input(const void *self, Sudoku *model);
+int process_input(void *self, Sudoku *model);
 int convert_to_menu_enum(char *menu_selection);
 int convert_to_consts(char *input);
 char *process_raw_input();
@@ -21,14 +21,15 @@ struct InputManager *newInputManager() {
     return NULL;
   }
   self->process_input = &process_input;
+  self->_old_value_of_column = '-';
 };
 
-int process_input(const void *self, Sudoku *model) {
+int process_input(void *self, Sudoku *model) {
   // Here we are using static vars because this function does not
   // need to work with several structs, i.e. we have something like
   // a singleton here
   static char *input;
-  // InputManager *converted_self = (InputManager *)self;
+  struct InputManager *converted_self = (struct InputManager *)self;
   int menu_state = DO_NOTHING;
 
   input = process_raw_input();
@@ -38,15 +39,19 @@ int process_input(const void *self, Sudoku *model) {
   switch (convert_to_consts(input))
   {
     case NEXT_COLUMN:
-      // @todo: replace with set(row, column, value)
-      model->_values[current_col] = '-';
+      // If we move over a column we need to cache the old
+      // value of it so we can put it in again
+      model->_values[current_col] = converted_self->_old_value_of_column;
+      converted_self->_old_value_of_column = model->_values[current_col + 1];
       model->_values[current_col + 1] = 'X';
       // With the state EDIT_SUDOKU we can redraw the output
       menu_state = EDIT_SUDOKU;
       break;
     case PREVIOUS_COLUMN:
-      // @todo: replace with set(row, column, value)
-      model->_values[current_col] = '-';
+      // If we move over a column we need to cache the old
+      // value of it so we can put it in again
+      model->_values[current_col] = converted_self->_old_value_of_column;
+      converted_self->_old_value_of_column = model->_values[current_col - 1];
       model->_values[current_col - 1] = 'X';
       menu_state = EDIT_SUDOKU;
       break;
@@ -64,6 +69,7 @@ int process_input(const void *self, Sudoku *model) {
       menu_state = EDIT_SUDOKU;
       break;
     case REMOVE_DIGIT:
+      converted_self->_old_value_of_column = '-';
       model->_values[current_col] = '-';
       model->_values[current_col + 1] = 'X';
       menu_state = EDIT_SUDOKU;

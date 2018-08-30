@@ -22,7 +22,8 @@
 
 struct InputManager
 {
-  int (*process_input)(const void *self, Sudoku *model);
+  int (*process_input)(void *self, Sudoku *model);
+  char _old_value_of_column;
 };
 
 struct InputManager *newInputManager();
