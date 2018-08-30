@@ -1,6 +1,7 @@
 #ifndef SIMPLE_TERMINAM_DRAWER
 #define SIMPLE_TERMINAM_DRAWER
 
+// Internal dependencies
 #include "../lib/sudoku.h"
 
 // This file defines the public interface

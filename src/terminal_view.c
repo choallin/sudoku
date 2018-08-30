@@ -8,6 +8,7 @@
 // Declaration of function which are "private"
 void update_view(const void *self, Sudoku *data_source, int mode);
 void redraw_terminal();
+void draw_edit_menu();
 void draw_main_menu();
 void draw_sudoku(Sudoku *sudoku);
 
@@ -27,11 +28,25 @@ struct TerminalView *newTerminalView() {
 void update_view(const void *self, Sudoku *data_source, int mode) {
   redraw_terminal();
   draw_sudoku(data_source);
+
+  if (mode == EDIT_MODE) {
+    draw_edit_menu();
+  }
+
   draw_main_menu();
 }
 
 void redraw_terminal() {
   system("clear");
+}
+
+void draw_edit_menu() {
+  puts("====================================");
+  puts("\t1. Next Column (nc)");
+  puts("\t2. Previous Column (pc)");
+  puts("\t3. Put Digit (1-9)");
+  puts("\t4. Remove Digit (0)");
+  puts("");
 }
 
 void draw_main_menu() {

@@ -6,19 +6,8 @@
 
 #include "lib/terminal_view.h"
 #include "lib/sudoku.h"
-#include "lib/helpers.h"
+#include "lib/input_manager.h"
 
-#define MENU_SIZE 10
-
-#define NEW_SUDOKU 110
-#define EDIT_SUDOKU 101
-#define SOLVE_SUDOKU 115
-#define QUIT 113
-
-
-int convert_to_menu_enum(char *menu_selection) {
-  return (int)menu_selection[0];
-}
 
 void initialize_new_sudoku(Sudoku *sudoku) {
   // We free the memory of the old Sudoku
@@ -32,22 +21,26 @@ void initialize_new_sudoku(Sudoku *sudoku) {
 
 int main(int argc, char const *argv[])
 {
-  char menu_selection[MENU_SIZE];
+  char *menu_selection;
   Sudoku *current_sudoku;
   current_sudoku = newSudoku();
+
   // Create the view manager
   struct TerminalView *view = newTerminalView();
   // The view manager is also able to create an
   // empty Sudoku, so here we initialize it
   view->update_view(view, current_sudoku, EDIT_MODE);
 
+  // Setup the input handling
+  struct InputManager *input = newInputManager();
+
   int input_switch;
+  int last_mode = EDIT_MODE;
   do
   {
     // Waiting for input to see what we should do next
     puts("Please choose... ");
-    await_input(menu_selection, MENU_SIZE, "%s");
-    input_switch = convert_to_menu_enum(menu_selection);
+    input_switch = input->process_input(input, current_sudoku);
     switch (input_switch)
     {
       case NEW_SUDOKU:
@@ -57,11 +50,13 @@ int main(int argc, char const *argv[])
         initialize_new_sudoku(current_sudoku);
       case EDIT_SUDOKU:
         view->update_view(view, current_sudoku, EDIT_MODE);
+        last_mode = EDIT_MODE;
         break;
       case SOLVE_SUDOKU:
         puts("Not implemented yet");
         break;
       default:
+        view->update_view(view, current_sudoku, last_mode);
         break;
     }
   } while (input_switch != QUIT );
