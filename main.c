@@ -6,6 +6,7 @@
 
 #include "lib/terminal_view.h"
 #include "lib/sudoku.h"
+#include "lib/sudoku_analyzer.h"
 #include "lib/input_manager.h"
 
 
@@ -26,6 +27,10 @@ int main(int argc, char const *argv[])
   Sudoku *current_sudoku;
   current_sudoku = newSudoku();
   initialize_new_sudoku(current_sudoku);
+
+  // Initialize a SudokuAnalzer
+  SudokuAnalyzer *sudoku_analyzer;
+  sudoku_analyzer = newSudokuAnalyzer();
 
   // Create the view manager
   struct TerminalView *view = newTerminalView();
@@ -55,14 +60,14 @@ int main(int argc, char const *argv[])
         last_mode = EDIT_MODE;
         break;
       case SOLVE_SUDOKU:
-        puts("Not implemented yet");
-        break;
+        // Again after solving the sudoku, we want
+        // to update the view again, so we let it fall
+        // through
+        sudoku_analyzer->analyze_sudoku(sudoku_analyzer, current_sudoku);
       default:
         view->update_view(view, current_sudoku, last_mode);
         break;
     }
   } while (input_switch != QUIT );
-
-
   return 0;
 }

@@ -9,8 +9,14 @@
 
 void set_column(void *self, int column, char value);
 char *get_row(const void *self,int row_number);
+char *get_row_for_column(const void *self, int column_number);
 char get_column(const void *self,int column_number);
+char *get_columns(const void *self, int column_number);
+char *get_columns_for_column(const void *self, int column_number);
 void set_value(void *self, int row, int column, char value);
+
+// Helper functions that are not bound to the object
+int get_row_number(int column_number);
 
 Sudoku *newSudoku() {
   // Allocate memory from heap so we can return a
@@ -20,7 +26,7 @@ Sudoku *newSudoku() {
   // anymore
   Sudoku *self = (Sudoku *)malloc(sizeof(Sudoku));
 
-  // If we fail to allocate memory propage failure with
+  // If we fail to allocate memory propagate failure with
   // returning NULL
   if (self == NULL) {
     return NULL;
@@ -30,12 +36,14 @@ Sudoku *newSudoku() {
   // so that we have oo like behavior (& is not needed
   // but it makes the intention very clear)
   self->get_row = &get_row;
+  self->get_row_for_column = &get_row_for_column;
   self->get_column = &get_column;
   self->set_value = &set_value;
   self->set_column = &set_column;
+  self->get_columns = &get_columns;
+  self->get_columns_for_column = &get_columns_for_column;
 
-  // The values are initialized with 0 as default
-
+  // The values are initialized with '-' as default
   for(int i = 0; i < 81; i++)
   {
     self->_values[i] = '-';
@@ -48,7 +56,7 @@ Sudoku *newSudoku() {
 char *get_row(const void *self,int row_number) {
   Sudoku *converted_self = (Sudoku *)self;
   // Here we are using this static char array because
-  // this way we don't have to care about the memory
+  // this way we don't have to care about freeing memory
   static char row_digits[10];
   // To find the index of the last element we look
   // at the grid and see that the last element is like
@@ -70,12 +78,60 @@ char *get_row(const void *self,int row_number) {
   return row_digits;
 }
 
-char get_column(const void *self,int column) {
+char *get_row_for_column(const void *self, int column_number) {
+  Sudoku *converted_self = (Sudoku *)self;
+  // We calculate the row number by subtracting 9 to the column_number
+  // until we reach the first row i.e. until the result is < 10
+
+  int row_number = get_row_number(column_number);
+  return converted_self->get_row(self, row_number);
+}
+
+char get_column(const void *self, int column) {
   if (column < 0 || column > 81) {
     return '-';
   }
   Sudoku *converted_self = (Sudoku *)self;
   return converted_self->_values[column];
+}
+
+char *get_columns(const void *self, int column_number) {
+  Sudoku *converted_self = (Sudoku *)self;
+  static char column_digits[10];
+
+  for(int i = 1; i <= 9; i++)
+  {
+    // To find all chars in one column we calculate the index of
+    // the column in the first row, and then multiply it with
+    // the row we are looking in (again - 1 because the array
+    // starts at 0)
+    int column_index = (9 + column_number - 1) * i;
+    column_digits[i-1] = converted_self->_values[column_index];
+  }
+  column_digits[9] = '\n';
+  return column_digits;
+}
+
+int get_row_number(int column_number) {
+  int row = 1;
+  while(column_number - (row * 9) > 9){
+    row++;
+  }
+  return row;
+}
+
+char *get_columns_for_column(const void *self, int column_number) {
+  Sudoku *converted_self = (Sudoku *)self;
+  // We calculate the row number by subtracting 9 to the column_number
+  // until we reach the first row i.e. until the result is < 10
+  int row_number = get_row_number(column_number);
+
+  // We can calculate the column number by subtracting 9 times the
+  // row - 1.
+  int column_index;
+  column_index = column_number - ((row_number - 1) * 9);
+
+  return converted_self->get_columns(self, column_index);
 }
 
 void set_value(void *self, int row, int column, char value) {

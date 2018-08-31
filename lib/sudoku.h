@@ -1,14 +1,15 @@
 #if !defined(SUDOKU)
 #define SUDOKU
 
-#include <stdint.h>   /* Standard int functions/typedefs */
-
 typedef struct SudokuStruct {
 
   // Here we define a function pointer to get a
   // prototype like object orientation
   char* (*get_row)(const void *self, int row_number);
+  char* (*get_row_for_column)(const void *self, int column_number);
   char (*get_column)(const void *self, int column);
+  char* (*get_columns)(const void *self, int column_number);
+  char* (*get_columns_for_column)(const void *self, int column_number);
   void (*set_value)(void *self, int row, int column, char value);
   void (*set_column)(void *self, int column, char value);
   // We save the values in a flat array
