@@ -8,7 +8,8 @@
 
 int process_input(void *self, Sudoku *model);
 int convert_to_menu_enum(char *menu_selection);
-int convert_to_consts(char *input);
+// Mutliplicator is the 2nd return value
+int convert_to_consts(char *input, int *multiplicator);
 char *process_raw_input();
 int current_column(Sudoku *model);
 void move_on_model(struct InputManager *self, Sudoku *model, int current_col, int distance, char value);
@@ -34,26 +35,33 @@ int process_input(void *self, Sudoku *model) {
   input = process_raw_input();
 
   int current_col = 0;
+  int *multiplicator;
+  *multiplicator = 0;
   current_col = current_column(model);
-  switch (convert_to_consts(input))
+  int switch_const = convert_to_consts(input, multiplicator);
+  switch (switch_const)
   {
     case NEXT_COLUMN:
-      move_on_model(converted_self, model, current_col, 1, 'X');
+      *multiplicator = (*multiplicator > 0) ? *multiplicator : 1;
+      move_on_model(converted_self, model, current_col, *multiplicator, 'X');
       menu_state = EDIT_SUDOKU;
       break;
     case PREVIOUS_COLUMN:
-      move_on_model(converted_self, model, current_col, -1, 'X');
+      *multiplicator = (*multiplicator > 0) ? *multiplicator : 1;
+      move_on_model(converted_self, model, current_col, *multiplicator * (-1), 'X');
       menu_state = EDIT_SUDOKU;
       break;
     case NEXT_ROW:
-      move_on_model(converted_self, model, current_col, 9, 'X');
+      *multiplicator = (*multiplicator > 0) ? *multiplicator : 1;
+      move_on_model(converted_self, model, current_col, *multiplicator * 9, 'X');
       // With the state EDIT_SUDOKU we can redraw the output
       menu_state = EDIT_SUDOKU;
       break;
     case PREVIOUS_ROW:
       // If we move over a column we need to cache the old
       // value of it so we can put it in again
-      move_on_model(converted_self, model, current_col, -9, 'X');
+      *multiplicator = (*multiplicator > 0) ? *multiplicator : 1;
+      move_on_model(converted_self, model, current_col, *multiplicator * (-9), 'X');
       menu_state = EDIT_SUDOKU;
       break;
     case 1:
@@ -118,8 +126,24 @@ int convert_to_menu_enum(char *menu_selection) {
   return (int)menu_selection[0];
 }
 
-int convert_to_consts(char *input) {
+int convert_to_consts(char *input, int *multiplicator) {
+  // Only valid mulitplicators are 1-9 so we check if the
+  // first char is in this range and that the max length
+  // is equal 3 (all navigation commands a 2 char commands)
+  if (strchr("123456789", input[0]) && strlen(input) == 3) {
+    *multiplicator = atoi(input);
+    // Here we remove the first element of the input
+    // by moving the pointer to the first element of
+    // the input to the 2nd actual element.
+    input = &input[1];
 
+    // If the strlen is still bigger than 2 there is an invalid
+    // input so we do nothing
+    if (strlen(input) > 2) {
+      return DO_NOTHING;
+    }
+
+  }
   if (strcmp(input, "nc") == 0) {
     return NEXT_COLUMN;
   }
@@ -135,7 +159,13 @@ int convert_to_consts(char *input) {
   if (strcmp(input, "pr") == 0) {
     return PREVIOUS_ROW;
   }
-  return atoi(input);
+  int digit = atoi(input);
+  // When the user wants to put a number in a col
+  // that is not between 1 - 9 we do nothing
+  if (digit < 1 || digit > 9) {
+    return DO_NOTHING;
+  }
+  return digit;
 }
 
 int current_column(Sudoku *model) {
@@ -161,5 +191,4 @@ void move_on_model(struct InputManager *self, Sudoku *model, int current_col, in
   model->set_column(model, current_col, self->_old_value_of_column);
   self->_old_value_of_column = model->get_column(model, current_col + distance);
   model->set_column(model, current_col + distance, value);
-  // With the state EDIT_SUDOKU we can redraw the output
 }
