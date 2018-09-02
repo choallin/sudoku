@@ -42,7 +42,9 @@ int process_input(void *self, Sudoku *model) {
   switch (switch_const)
   {
     case NEXT_COLUMN:
+      puts("move in grid");
       *multiplicator = (*multiplicator > 0) ? *multiplicator : 1;
+      printf("multplicator; %d", multiplicator);
       move_on_model(converted_self, model, current_col, *multiplicator, 'X');
       menu_state = EDIT_SUDOKU;
       break;
