@@ -11,7 +11,6 @@ void set_column(void *self, int column, char value);
 char *get_row(const void *self,int row_number);
 char *get_row_for_column(const void *self, int column_number);
 char get_column(const void *self,int column_number);
-char *get_columns(const void *self, int column_number);
 char *get_columns_for_column(const void *self, int field_index);
 void set_value(void *self, int row, int column, char value);
 
@@ -40,7 +39,6 @@ Sudoku *newSudoku() {
   self->get_column = &get_column;
   self->set_value = &set_value;
   self->set_column = &set_column;
-  self->get_columns = &get_columns;
   self->get_columns_for_column = &get_columns_for_column;
 
   // The values are initialized with '-' as default
@@ -93,23 +91,6 @@ char get_column(const void *self, int column) {
   }
   Sudoku *converted_self = (Sudoku *)self;
   return converted_self->_values[column];
-}
-
-char *get_columns(const void *self, int column_number) {
-  Sudoku *converted_self = (Sudoku *)self;
-  static char column_digits[10];
-
-  for(int i = 1; i <= 9; i++)
-  {
-    // To find all chars in one column we calculate the index of
-    // the column in the first row, and then multiply it with
-    // the row we are looking in (again - 1 because the array
-    // starts at 0)
-    int column_index = (9 + column_number - 1) * i;
-    column_digits[i-1] = converted_self->_values[column_index];
-  }
-  column_digits[9] = '\0';
-  return column_digits;
 }
 
 int get_row_number(int column_number) {
