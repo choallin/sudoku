@@ -12,7 +12,7 @@ char *get_row(const void *self,int row_number);
 char *get_row_for_column(const void *self, int column_number);
 char get_column(const void *self,int column_number);
 char *get_columns(const void *self, int column_number);
-char *get_columns_for_column(const void *self, int column_number);
+char *get_columns_for_column(const void *self, int field_index);
 void set_value(void *self, int row, int column, char value);
 
 // Helper functions that are not bound to the object
@@ -108,30 +108,39 @@ char *get_columns(const void *self, int column_number) {
     int column_index = (9 + column_number - 1) * i;
     column_digits[i-1] = converted_self->_values[column_index];
   }
-  column_digits[9] = '\n';
+  column_digits[9] = '\0';
   return column_digits;
 }
 
 int get_row_number(int column_number) {
   int row = 1;
-  while(column_number - (row * 9) > 9){
+  if (column_number < 9) {
+    return row;
+  }
+  while(column_number - (row * 9) >= 0){
     row++;
   }
   return row;
 }
 
-char *get_columns_for_column(const void *self, int column_number) {
+char *get_columns_for_column(const void *self, int field_index) {
   Sudoku *converted_self = (Sudoku *)self;
-  // We calculate the row number by subtracting 9 to the column_number
+  static char column_digits[10];
+  // We calculate the row number by subtracting 9 to the field_index
   // until we reach the first row i.e. until the result is < 10
-  int row_number = get_row_number(column_number);
+  int row_number = get_row_number(field_index);
 
   // We can calculate the column number by subtracting 9 times the
   // row - 1.
   int column_index;
-  column_index = column_number - ((row_number - 1) * 9);
+  column_index = (field_index - ((row_number - 1) * 9) + 1);
 
-  return converted_self->get_columns(self, column_index);
+  // Now we put each char in column_digits
+  for (int i = 0; i < 9; i++) {
+    column_digits[i] = converted_self->_values[column_index - 1 + (i*9)];
+  }
+  column_digits[9] = '\0';
+  return column_digits;
 }
 
 void set_value(void *self, int row, int column, char value) {
