@@ -37,9 +37,6 @@ int analyze_sudoku(const void *self, Sudoku *sudoku) {
     int success = 0;
     // All possible values of a row
     char *chars_in_row;
-    if(i==10) {
-      printf("aha");
-    }
     chars_in_row = sudoku->get_row_for_column(sudoku, i);
     // After receiving all chars from one row, we remove
     // those from the one we have in our options
@@ -57,6 +54,10 @@ int analyze_sudoku(const void *self, Sudoku *sudoku) {
 
     if (!success) {
       // look at the current square
+      char *chars_in_square;
+      chars_in_square = sudoku->get_square_for_column(sudoku, i);
+      remove_from_options(options, chars_in_square);
+      success = set_column_if_options_array_has_only_one_digit(sudoku, i, options);
     }
   }
 }
@@ -90,10 +91,14 @@ int set_column_if_options_array_has_only_one_digit(Sudoku *sudoku, int column, c
     }
   }
 
+  if (index_of_digit > 81 || index_of_digit < 0) {
+    return 0;
+  }
+
   // Here we can be sure that the amount of digits
   // in our options is only 1. And since we counted
   // the index as well, we already know where it is
   // so we just set it in the column
-  sudoku->set_column(sudoku, column - 1, options[index_of_digit]);
+  sudoku->set_column(sudoku, column, options[index_of_digit]);
   return 1;
 }

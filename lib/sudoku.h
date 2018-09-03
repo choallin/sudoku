@@ -9,6 +9,7 @@ typedef struct SudokuStruct {
   char* (*get_row_for_column)(const void *self, int column_number);
   char (*get_column)(const void *self, int column);
   char* (*get_columns_for_column)(const void *self, int column_number);
+  char* (*get_square_for_column)(const void *self, int column_number);
   void (*set_value)(void *self, int row, int column, char value);
   void (*set_column)(void *self, int column, char value);
   // We save the values in a flat array

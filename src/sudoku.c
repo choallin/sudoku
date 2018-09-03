@@ -12,10 +12,12 @@ char *get_row(const void *self,int row_number);
 char *get_row_for_column(const void *self, int column_number);
 char get_column(const void *self,int column_number);
 char *get_columns_for_column(const void *self, int field_index);
+char *get_square_for_column(const void *self, int field_index);
 void set_value(void *self, int row, int column, char value);
 
 // Helper functions that are not bound to the object
 int get_row_number(int column_number);
+int get_column_index(int field_index);
 
 Sudoku *newSudoku() {
   // Allocate memory from heap so we can return a
@@ -40,6 +42,7 @@ Sudoku *newSudoku() {
   self->set_value = &set_value;
   self->set_column = &set_column;
   self->get_columns_for_column = &get_columns_for_column;
+  self->get_square_for_column = &get_square_for_column;
 
   // The values are initialized with '-' as default
   for(int i = 0; i < 81; i++)
@@ -104,24 +107,96 @@ int get_row_number(int column_number) {
   return row;
 }
 
-char *get_columns_for_column(const void *self, int field_index) {
-  Sudoku *converted_self = (Sudoku *)self;
-  static char column_digits[10];
-  // We calculate the row number by subtracting 9 to the field_index
-  // until we reach the first row i.e. until the result is < 10
+int get_column_index(int field_index) {
   int row_number = get_row_number(field_index);
-
   // We can calculate the column number by subtracting 9 times the
   // row - 1.
   int column_index;
-  column_index = (field_index - ((row_number - 1) * 9) + 1);
+  return (field_index - ((row_number - 1) * 9) + 1);
+}
 
+char *get_columns_for_column(const void *self, int field_index) {
+  Sudoku *converted_self = (Sudoku *)self;
+  static char column_digits[10];
+
+
+  int column_index = get_column_index(field_index);
   // Now we put each char in column_digits
   for (int i = 0; i < 9; i++) {
     column_digits[i] = converted_self->_values[column_index - 1 + (i*9)];
   }
   column_digits[9] = '\0';
   return column_digits;
+}
+
+char *get_square_for_column(const void *self, int field_index) {
+  Sudoku *converted_self = (Sudoku *)self;
+  static char square_digits[10];
+
+  int row_number = get_row_number(field_index) - 1;
+  int column_index = get_column_index(field_index) - 1;
+
+  int col_indizes[3];
+  int row_indizes[3];
+
+  switch (column_index % 3)
+  {
+    case 0:
+      // The field is in the last column of the square we are looking for
+      col_indizes[0] = column_index;
+      col_indizes[1] = column_index + 1;
+      col_indizes[2] = column_index + 2;
+      break;
+    case 1:
+      col_indizes[0] = column_index - 1;
+      col_indizes[1] = column_index;
+      col_indizes[2] = column_index + 1;
+      break;
+    case 2:
+      col_indizes[0] = column_index - 2;
+      col_indizes[1] = column_index - 1;
+      col_indizes[2] = column_index;
+      break;
+    default:
+      break;
+  }
+
+
+  switch (row_number % 3)
+  {
+    case 0:
+      row_indizes[0] = row_number;
+      row_indizes[1] = row_number + 1;
+      row_indizes[2] = row_number + 2;
+      break;
+    case 1:
+      row_indizes[0] = row_number - 1;
+      row_indizes[1] = row_number;
+      row_indizes[2] = row_number + 1;
+      break;
+    case 2:
+      row_indizes[0] = row_number - 2;
+      row_indizes[1] = row_number - 1;
+      row_indizes[2] = row_number;
+      break;
+    default:
+      break;
+  }
+
+  int counter = 0;
+  for(int i = 0; i < 3; i++)
+  {
+    for(int j = 0; j < 3; j++)
+    {
+      int field_idx = col_indizes[i] + ((row_indizes[j]) * 9);
+
+      square_digits[counter] = converted_self->_values[field_idx];
+      counter++;
+    }
+
+  }
+  square_digits[9] = '\0';
+  return square_digits;
 }
 
 void set_value(void *self, int row, int column, char value) {
