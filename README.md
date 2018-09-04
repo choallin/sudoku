@@ -1,15 +1,16 @@
-# Sudoku solver [WIP]
+# Sudoku solver
 
 ![demo](./images/solved_demo.gif)
 
-## Features (right now)
+## Features
 
-Right now everything is terminal based and in a very simple way displayed there
+Right now everything is terminal based and displayed in a very simple way
 
-- Display a sudoku
-- Create a new sudoku
+The features are:
+- Display a Sudoku
+- Create a new Sudoku
 - Move in grid
-  - Move with multiplicators i.e. 7nc would move 7 columns to the right
+  - Move with multiplicators e.g. 7nc means 7 columns to the right
 - Write digits
 - Remove digits
 - Solve the next step in the Sudoku
@@ -33,6 +34,6 @@ To compile it with e.g. gcc you have to use this command:
 Then you can execute the sudoku binary.
 When you start the application it will display a sudoku which you are free to edit. You can navigate in the grid
 with the commands that are displayed in the menu. So, `nc` would be next column and with a multiplier you can move
-many columns/rows at once.
-The main purpose of this program is to solve a sudoku for you, so when you are finished editing your sudoku, you can
+over many columns/rows at once.
+The main purpose of this program is to solve a sudoku for you, so when you have finished editing your sudoku, you can
 tell it to do so by calling the `s` command. This will solve your sudoku step by step, which means, you have to press the `s` multiple times.
