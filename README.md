@@ -1,6 +1,6 @@
 # Sudoku solver [WIP]
 
-![demo](./images/demo.gif)
+![demo](./images/solved_demo.gif)
 
 ## Features (right now)
 
