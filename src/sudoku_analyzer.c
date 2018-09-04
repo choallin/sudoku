@@ -23,8 +23,18 @@ SudokuAnalyzer *newSudokuAnalyzer() {
   self->analyze_sudoku = &analyze_sudoku;
 }
 
+// Here is a description of the solving algorithm:
+// First we have an array with all the options that could
+// go into a field (123456789), then we look if the current
+// field is already filled with one of those.
+// If not we take a look at the row and erase all digits
+// from our options array that are already in use.
+// Then we check how many options we still have, and
+// if we have only 1 option left we write this digit
+// in the field.
+// If we have more options left we do the same for
+// the current column and current square.
 int analyze_sudoku(const void *self, Sudoku *sudoku) {
-  // We look at every field to find out what options we have for it
   for(int i = 0; i < 82; i++)
   {
     char options[10] = "123456789";

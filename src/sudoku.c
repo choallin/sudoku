@@ -13,7 +13,6 @@ char *get_row_for_column(const void *self, int column_number);
 char get_column(const void *self,int column_number);
 char *get_columns_for_column(const void *self, int field_index);
 char *get_square_for_column(const void *self, int field_index);
-void set_value(void *self, int row, int column, char value);
 
 // Helper functions that are not bound to the object
 int get_row_number(int column_number);
@@ -39,7 +38,6 @@ Sudoku *newSudoku() {
   self->get_row = &get_row;
   self->get_row_for_column = &get_row_for_column;
   self->get_column = &get_column;
-  self->set_value = &set_value;
   self->set_column = &set_column;
   self->get_columns_for_column = &get_columns_for_column;
   self->get_square_for_column = &get_square_for_column;
@@ -133,12 +131,29 @@ char *get_square_for_column(const void *self, int field_index) {
   Sudoku *converted_self = (Sudoku *)self;
   static char square_digits[10];
 
+  // To find in which square the search field is, we at first get
+  // the row number and column index (- 1 because this way we can
+  // easily find the "real" index)
   int row_number = get_row_number(field_index) - 1;
   int column_index = get_column_index(field_index) - 1;
 
   int col_indizes[3];
   int row_indizes[3];
 
+  // To find in which square the current field is we look at the
+  // result from the colum index % 3
+  // Reason: Assume we want to find out the square for the field
+  // with index 10. This is the square we are looking at:
+  // # 0  | 1  | 2  #...
+  // # 9  | 10 | 11 #...
+  // # 18 | 19 | 20 #...
+  // Now, we see the field is the middle one. From our calculation
+  // we get 1 as a result. (Of course this is true for every field.
+  // The result of the middle field is always 1.) To find the first
+  // column we subtract 1 from our field and to find the last, we
+  // add 1.
+  // For the first (resutl = 0) and the last (result  = 2) we do
+  // something similar
   switch (column_index % 3)
   {
     case 0:
@@ -161,7 +176,8 @@ char *get_square_for_column(const void *self, int field_index) {
       break;
   }
 
-
+  // The row calculation can be explain exactly like the column explanation
+  // so, please see above
   switch (row_number % 3)
   {
     case 0:
@@ -183,6 +199,8 @@ char *get_square_for_column(const void *self, int field_index) {
       break;
   }
 
+  // When we have the row numbers and the col numbers, we interate
+  // over them and put the values in our result array
   int counter = 0;
   for(int i = 0; i < 3; i++)
   {
@@ -197,10 +215,6 @@ char *get_square_for_column(const void *self, int field_index) {
   }
   square_digits[9] = '\0';
   return square_digits;
-}
-
-void set_value(void *self, int row, int column, char value) {
-
 }
 
 void set_column(void *self, int column, char value) {
